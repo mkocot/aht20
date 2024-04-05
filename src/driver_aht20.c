@@ -187,51 +187,67 @@ uint8_t aht20_init(aht20_handle_t *handle)
     {
         return 2;                                                      /* return error */
     }
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
     if (handle->debug_print == NULL)                                   /* check debug_print */
     {
         return 3;                                                      /* return error */
     }
+#endif
     if (handle->iic_init == NULL)                                      /* check iic_init */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: iic_init is null.\n");             /* iic_init is null */
+#endif
         
         return 3;                                                      /* return error */
     }
     if (handle->iic_deinit == NULL)                                    /* check iic_deinit */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: iic_deinit is null.\n");           /* iic_deinit is null */
+#endif
         
         return 3;                                                      /* return error */
     }
     if (handle->iic_read_cmd == NULL)                                  /* check iic_read_cmd */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: iic_read_cmd is null.\n");         /* iic_read_cmd is null */
+#endif
         
         return 3;                                                      /* return error */
     }
     if (handle->iic_write_cmd == NULL)                                 /* check iic_write_cmd */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: iic_write_cmd is null.\n");        /* iic_write_cmd is null */
+#endif
         
         return 3;                                                      /* return error */
     }
     if (handle->delay_ms == NULL)                                      /* check delay_ms */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: delay_ms is null.\n");             /* delay_ms is null */
+#endif
         
         return 3;                                                      /* return error */
     }
     
     if (handle->iic_init() != 0)                                       /* iic init */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: iic init failed.\n");              /* iic init failed */
+#endif
         
         return 1;                                                      /* return error */
     }
     handle->delay_ms(500);                                             /* wait for 500 ms */
     if (a_aht20_iic_read(handle, &status, 1) != 0)                     /* read the status */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: read status failed.\n");           /* read status failed */
+#endif
         (void)handle->iic_deinit();                                    /* close the iic */
         
         return 4;                                                      /* return error */
@@ -240,21 +256,27 @@ uint8_t aht20_init(aht20_handle_t *handle)
     {
         if (a_aht20_jh_reset_reg(handle, 0x1B) != 0)                   /* reset the 0x1B */
         {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
             handle->debug_print("aht20: reset reg failed.\n");         /* reset reg failed */
+#endif
             (void)handle->iic_deinit();                                /* close the iic */
             
             return 5;                                                  /* return error */
         }
         if (a_aht20_jh_reset_reg(handle, 0x1C) != 0)                   /* reset the 0x1C */
         {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
             handle->debug_print("aht20: reset reg failed.\n");         /* reset reg failed */
+#endif
             (void)handle->iic_deinit();                                /* close the iic */
             
             return 5;                                                  /* return error */
         }
         if (a_aht20_jh_reset_reg(handle, 0x1E) != 0)                   /* reset the 0x1E */
         {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
             handle->debug_print("aht20: reset reg failed.\n");         /* reset reg failed */
+#endif
             (void)handle->iic_deinit();                                /* close the iic */
             
             return 5;                                                  /* return error */
@@ -289,7 +311,9 @@ uint8_t aht20_deinit(aht20_handle_t *handle)
     
     if (handle->iic_deinit() != 0)                                 /* iic deinit */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: iic deinit failed.\n");        /* iic deinit failed */
+#endif
         
         return 1;                                                  /* return error */
     }
@@ -334,14 +358,18 @@ uint8_t aht20_read_temperature_humidity(aht20_handle_t *handle, uint32_t *temper
     buf[2] = 0x00;                                                    /* set 0x00 */
     if (a_aht20_iic_write(handle, buf, 3) != 0)                       /* write the command */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: sent command failed.\n");         /* sent command failed */
+#endif
         
         return 1;                                                     /* return error */
     }
     handle->delay_ms(85);                                             /* delay 85ms */
     if (a_aht20_iic_read(handle, &status, 1) != 0)                    /* read the status */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: read status failed.\n");          /* read status failed */
+#endif
         
         return 1;                                                     /* return error */
     }
@@ -349,13 +377,17 @@ uint8_t aht20_read_temperature_humidity(aht20_handle_t *handle, uint32_t *temper
     {
         if (a_aht20_iic_read(handle, buf, 7) != 0)                    /* read data */
         {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
             handle->debug_print("aht20: read data failed.\n");        /* read data failed */
+#endif
             
             return 1;                                                 /* return error */
         }
         if (a_aht20_calc_crc(buf, 6) != buf[6])                       /* check the crc */
         {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
             handle->debug_print("aht20: crc is error.\n");            /* crc is error */
+#endif
             
             return 5;                                                 /* return error */
         }
@@ -378,7 +410,9 @@ uint8_t aht20_read_temperature_humidity(aht20_handle_t *handle, uint32_t *temper
     }
     else
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: data is not ready.\n");           /* data is not ready */
+#endif
         
         return 4;                                                     /* return error */
     }
@@ -417,14 +451,18 @@ uint8_t aht20_read_temperature(aht20_handle_t *handle, uint32_t *temperature_raw
     buf[2] = 0x00;                                                    /* set 0x00 */
     if (a_aht20_iic_write(handle, buf, 3) != 0)                       /* write the command */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: sent command failed.\n");         /* sent command failed */
+#endif
         
         return 1;                                                     /* return error */
     }
     handle->delay_ms(85);                                             /* delay 85ms */
     if (a_aht20_iic_read(handle, &status, 1) != 0)                    /* read the status */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: read status failed.\n");          /* read status failed */
+#endif
         
         return 1;                                                     /* return error */
     }
@@ -432,13 +470,17 @@ uint8_t aht20_read_temperature(aht20_handle_t *handle, uint32_t *temperature_raw
     {
         if (a_aht20_iic_read(handle, buf, 7) != 0)                    /* read data */
         {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
             handle->debug_print("aht20: read data failed.\n");        /* read data failed */
+#endif
             
             return 1;                                                 /* return error */
         }
         if (a_aht20_calc_crc(buf, 6) != buf[6])                       /* check the crc */
         {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
             handle->debug_print("aht20: crc is error.\n");            /* crc is error */
+#endif
             
             return 5;                                                 /* return error */
         }
@@ -455,7 +497,9 @@ uint8_t aht20_read_temperature(aht20_handle_t *handle, uint32_t *temperature_raw
     }
     else
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: data is not ready.\n");           /* data is not ready */
+#endif
         
         return 4;                                                     /* return error */
     }
@@ -494,14 +538,18 @@ uint8_t aht20_read_humidity(aht20_handle_t *handle, uint32_t *humidity_raw, uint
     buf[2] = 0x00;                                                    /* set 0x00 */
     if (a_aht20_iic_write(handle, buf, 3) != 0)                       /* write the command */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: sent command failed.\n");         /* sent command failed */
+#endif
         
         return 1;                                                     /* return error */
     }
     handle->delay_ms(85);                                             /* delay 85ms */
     if (a_aht20_iic_read(handle, &status, 1) != 0)                    /* read the status */
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: read status failed.\n");          /* read status failed */
+#endif
         
         return 1;                                                     /* return error */
     }
@@ -509,13 +557,17 @@ uint8_t aht20_read_humidity(aht20_handle_t *handle, uint32_t *humidity_raw, uint
     {
         if (a_aht20_iic_read(handle, buf, 7) != 0)                    /* read data */
         {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
             handle->debug_print("aht20: read data failed.\n");        /* read data failed */
+#endif
             
             return 1;                                                 /* return error */
         }
         if (a_aht20_calc_crc(buf, 6) != buf[6])                       /* check the crc */
         {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
             handle->debug_print("aht20: crc is error.\n");            /* crc is error */
+#endif
             
             return 5;                                                 /* return error */
         }
@@ -531,7 +583,9 @@ uint8_t aht20_read_humidity(aht20_handle_t *handle, uint32_t *humidity_raw, uint
     }
     else
     {
+#ifdef DRIVER_AHT20_WITH_DEBUG_PRINT
         handle->debug_print("aht20: data is not ready.\n");           /* data is not ready */
+#endif
         
         return 4;                                                     /* return error */
     }
